@@ -22,7 +22,6 @@ services:
     strichliste_db:
         restart: unless-stopped
         image: yobasystems/alpine-mariadb
-        restart: always
         env_file:
             - docker.env
         volumes:
