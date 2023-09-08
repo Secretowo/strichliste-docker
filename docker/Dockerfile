@@ -3,13 +3,20 @@ FROM alpine:3.18 as release
 RUN apk --no-cache add ca-certificates \
   && apk --no-cache add \
   curl \
-  tar
+  tar \
+  git \
+  yarn 
+
 
 RUN mkdir /source
-WORKDIR /source
-RUN curl -Lo strichliste.tar.gz https://github.com/strichliste/strichliste/releases/download/v1.8.2/strichliste-v1.8.2.tar.gz
-RUN tar -xf strichliste.tar.gz
-RUN rm -r strichliste.tar.gz
+RUN mkdir /frontend
+RUN git clone https://github.com/Secretowo/strichliste-backend source
+RUN git clone https://github.com/Secretowo/strichliste-web-frontend frontend
+WORKDIR /frontend
+RUN yarn install
+RUN NODE_OPTIONS=--openssl-legacy-provider yarn build
+RUN cp -r build/* /source/public
+
 
 
 FROM alpine:3.18
