@@ -1,20 +1,13 @@
 version: "2"
 
-networks:
-    db_net:
-        external: false
 services:
     strichliste:
+        restart: unless-stopped
         build:
             context: .
             dockerfile: ./docker/Dockerfile
-        # if you use traefik you can remove the ports section
         ports:
-            - 8080:8080
-        networks:
-            # - traefik_network  # your traefik network
-            - default
-            - db_net
+            - 7650:8080
         env_file:
             - docker.env
         volumes:
@@ -23,19 +16,13 @@ services:
              - ./config/doctrine.yaml:/source/config/packages/doctrine.yaml
 
         environment:
-            APP_ENV: "prod"
+            APP_ENV: "local"
+            APP_DEBUG: "true"
 
-        # Traefik configuration
-        # labels:
-        #     - "traefik.docker.network={your traefik network}"
-        #     - "traefik.frontend.rule=Host:{URL}"
-        #     - "traefik.enable=true"
-        #     - "traefik.port=8080"
     strichliste_db:
-        image: mariadb:10.4.6
+        restart: unless-stopped
+        image: yobasystems/alpine-mariadb
         restart: always
-        networks:
-            - db_net
         env_file:
             - docker.env
         volumes:
