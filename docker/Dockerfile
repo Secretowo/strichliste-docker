@@ -1,21 +1,24 @@
-FROM alpine:3.18 as release
+FROM alpine:3.18 as frontend
 
 RUN apk --no-cache add ca-certificates \
   && apk --no-cache add \
-  curl \
-  tar \
   git \
   yarn 
 
-
-RUN mkdir /source
 RUN mkdir /frontend
-RUN git clone https://github.com/Secretowo/strichliste-backend source
-RUN git clone https://github.com/Secretowo/strichliste-web-frontend frontend
+RUN git clone https://github.com/Secretowo/strichliste-web-frontend /frontend
 WORKDIR /frontend
 RUN yarn install
 RUN NODE_OPTIONS=--openssl-legacy-provider yarn build
-RUN cp -r build/* /source/public
+
+FROM composer as backend
+
+RUN mkdir /backend
+RUN git clone https://github.com/Secretowo/strichliste-backend /backend
+WORKDIR /backend
+RUN ls -la
+RUN composer update
+RUN composer install --no-dev --no-interaction --optimize-autoloader
 
 
 
@@ -40,7 +43,8 @@ RUN apk --no-cache add ca-certificates \
   mysql-client \
   yarn
 
-COPY --from=release /source source
+COPY --from=backend /backend source
+COPY --from=frontend /frontend/build /source/public
 
 COPY /docker/entrypoint.sh /source/entrypoint.sh
 RUN chmod +x /source/entrypoint.sh
