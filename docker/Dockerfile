@@ -16,7 +16,6 @@ FROM composer as backend
 RUN mkdir /backend
 RUN git clone https://github.com/Secretowo/strichliste-backend /backend
 WORKDIR /backend
-RUN ls -la
 RUN composer update
 RUN composer install --no-dev --no-interaction --optimize-autoloader
 
