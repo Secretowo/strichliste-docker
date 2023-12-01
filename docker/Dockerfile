@@ -6,15 +6,15 @@ RUN apk --no-cache add ca-certificates \
   yarn 
 
 RUN mkdir /frontend
-RUN git clone https://github.com/Secretowo/strichliste-web-frontend /frontend
+RUN git clone --branch dev https://github.com/Secretowo/strichliste-web-frontend /frontend
 WORKDIR /frontend
 RUN yarn install
 RUN NODE_OPTIONS=--openssl-legacy-provider yarn build
 
-FROM composer as backend
+FROM composer:2.6 as backend
 
 RUN mkdir /backend
-RUN git clone https://github.com/Secretowo/strichliste-backend /backend
+RUN git clone --branch dev https://github.com/Secretowo/strichliste-backend /backend
 WORKDIR /backend
 RUN composer update
 RUN composer install --no-dev --no-interaction --optimize-autoloader
